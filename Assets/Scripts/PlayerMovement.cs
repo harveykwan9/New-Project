@@ -7,13 +7,14 @@ public class PlayerMovement : MonoBehaviour
     public CharacterController controller;
     public Transform cam;
     public Transform groundCheck;
+    public Animator animator;
 
 
     public float speed = 6f;
     public float jumpHeight = 3f;
     public float gravity = -9.81f;
     public float turnSmoothing = 0.1f;
-    public float groundDistance = 0.4f;
+    public float groundDistance = 0.1f;
     public LayerMask groundMask;
 
     private float turnSmoothVelocity;
@@ -38,10 +39,13 @@ public class PlayerMovement : MonoBehaviour
         Vector3 moveDirection = Vector3.zero;
 
         if (direction.magnitude >= 0.1f) {
+            animator.SetBool("isRunning", true);
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle,  ref turnSmoothVelocity, turnSmoothing);
             moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        } else {
+            animator.SetBool("isRunning", false);
         }
 
         controller.Move(moveDirection.normalized * speed * Time.deltaTime);
