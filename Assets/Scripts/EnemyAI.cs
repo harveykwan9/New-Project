@@ -8,6 +8,7 @@ public class EnemyAI : MonoBehaviour {
     public float moveSpeed = 3.0f;
     public float detectionDistance = 10.0f;
     public float stopDistance = 5.0f;
+    public float lookSpeed = 5.0f;
 
     private Vector3 dir = Vector3.right;
 
@@ -18,30 +19,32 @@ public class EnemyAI : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        lookTowards();
         axisMovement();
     }
 
-    // Look towards a target object all the time
+    // Smoothly look towards a target object all the time
     void lookTowards() {
-        Vector3 thisObj = gameObject.transform.position;
-        Vector3 playerObj = target.transform.position;
-        Vector3 location = playerObj - thisObj;
-        Vector3 temp = Vector3.RotateTowards(thisObj, location, 10, 100);
-        gameObject.transform.rotation = Quaternion.LookRotation(temp);
+        Quaternion lookRotation = Quaternion.LookRotation(target.transform.position - gameObject.transform.position).normalized;
+        gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, lookRotation, lookSpeed * Time.deltaTime);
     }
 
     // Movement based on detection
+    // If player is within the detection distance and stop distance, move towards and look at player
+    // If player is within the stop distance, only look at player
+    // If moved away, move back to the user defined idle location
     void axisMovement() {
         Vector3 thisObj = gameObject.transform.position;
         Vector3 playerObj = target.transform.position;
         float distance = Vector3.Distance(thisObj, playerObj);
         float speed = moveSpeed * Time.deltaTime;
+            
         if (distance < detectionDistance && distance > stopDistance) {
             gameObject.transform.position = Vector3.MoveTowards(thisObj, playerObj, speed);
-            strafe();
+            lookTowards();
+        } else if (distance < stopDistance) {
+            lookTowards();
         } else {
-            strafe();
+            
         }
     }
 
