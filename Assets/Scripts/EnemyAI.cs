@@ -9,6 +9,8 @@ public class EnemyAI : MonoBehaviour {
     public float detectionDistance = 10.0f;
     public float stopDistance = 5.0f;
     public float lookSpeed = 5.0f;
+    public Vector3 idleLocation;
+    public Vector3 idleLookVector = Vector3.forward;
 
     private Vector3 dir = Vector3.right;
 
@@ -23,15 +25,15 @@ public class EnemyAI : MonoBehaviour {
     }
 
     // Smoothly look towards a target object all the time
-    void lookTowards() {
-        Quaternion lookRotation = Quaternion.LookRotation(target.transform.position - gameObject.transform.position).normalized;
+    void lookTowards(Vector3 vector) {
+        Quaternion lookRotation = Quaternion.LookRotation(vector - gameObject.transform.position).normalized;
         gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, lookRotation, lookSpeed * Time.deltaTime);
     }
 
     // Movement based on detection
     // If player is within the detection distance and stop distance, move towards and look at player
     // If player is within the stop distance, only look at player
-    // If moved away, move back to the user defined idle location
+    // If moved away, move back to the user defined idle location, and look towards a user defined vector;
     void axisMovement() {
         Vector3 thisObj = gameObject.transform.position;
         Vector3 playerObj = target.transform.position;
@@ -40,11 +42,15 @@ public class EnemyAI : MonoBehaviour {
             
         if (distance < detectionDistance && distance > stopDistance) {
             gameObject.transform.position = Vector3.MoveTowards(thisObj, playerObj, speed);
-            lookTowards();
+            lookTowards(target.transform.position);
         } else if (distance < stopDistance) {
-            lookTowards();
+            lookTowards(target.transform.position);
         } else {
-            
+            gameObject.transform.position = Vector3.MoveTowards(thisObj, idleLocation, speed);
+            lookTowards(idleLocation);
+            if (thisObj == idleLocation) {
+                lookTowards(idleLookVector);
+            }
         }
     }
 
