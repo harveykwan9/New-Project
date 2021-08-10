@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour {
     
+    public float health = 100;
     public GameObject target;
     public float moveSpeed = 3.0f;
     public float detectionDistance = 10.0f;
@@ -19,8 +20,7 @@ public class EnemyAI : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         axisMovement();
     }
 
@@ -54,6 +54,12 @@ public class EnemyAI : MonoBehaviour {
         }
     }
 
+    // jump back when the player has dealt too much damage to it within a time
+    void jumpBack() {
+        // TODO
+    }
+
+    // PROLLY NOT USING THIS, BAD NOT WORKING
     void strafe() {
         gameObject.transform.Translate(dir*moveSpeed*Time.deltaTime);
         if (gameObject.transform.position.x >= -4) {

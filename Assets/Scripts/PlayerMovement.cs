@@ -17,16 +17,12 @@ public class PlayerMovement : MonoBehaviour
     public float groundDistance = 0.1f;
     public LayerMask groundMask;
     public float cameraScrollSensitivity = 1.0f;
+    [Tooltip("x = max radius, y = min radius for zoom")]
     public Vector2 maxMinOrbits = new Vector2(25.0f, 5.0f);
 
     private float turnSmoothVelocity;
     private Vector3 fallVelocity;
     private bool isGrounded;
-
-    // Called once at start
-    void Start() {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -40,7 +36,8 @@ public class PlayerMovement : MonoBehaviour
         scrollZoom();
     }
 
-    // using UnityInput to control axis movement and camera following
+    // Using UnityInput to control axis movement and camera following
+    // Takes care of rotating the camera
     void axisMovement() {
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
@@ -74,20 +71,33 @@ public class PlayerMovement : MonoBehaviour
         controller.Move(fallVelocity * Time.deltaTime);
     }
 
+    // Scrolling in and out will adjust the orbital heights and orbital radii of the players Third Person Camera (TPCam)
+    // If we are within the user defined limits, change the heights/radii of orbits
+    // If we reached a limit, and we are scrolling away from this limit, allow the change of heights/radii of orbits 
+    // Height scaling will be divided by 20 as it is more sensitive to changes, I could make this user defined later to tweek in game, but I already have too many Vars.
     void scrollZoom() {
         for (int i = 0; i < TPCam.m_Orbits.Length; i++) {
             if (TPCam.m_Orbits[i].m_Radius > maxMinOrbits.y && TPCam.m_Orbits[i].m_Radius < maxMinOrbits.x) {
                 TPCam.m_Orbits[i].m_Radius -= Input.mouseScrollDelta.y * cameraScrollSensitivity;
+                TPCam.m_Orbits[i].m_Height -= Input.mouseScrollDelta.y * (cameraScrollSensitivity / 20);
             } else if (TPCam.m_Orbits[i].m_Radius <= maxMinOrbits.y && Input.mouseScrollDelta.y * cameraScrollSensitivity < 0) {
                 TPCam.m_Orbits[i].m_Radius -= Input.mouseScrollDelta.y * cameraScrollSensitivity;
+                TPCam.m_Orbits[i].m_Height -= Input.mouseScrollDelta.y * (cameraScrollSensitivity / 20);
             } else if (TPCam.m_Orbits[i].m_Radius >= maxMinOrbits.x && Input.mouseScrollDelta.y * cameraScrollSensitivity > 0) {
                 TPCam.m_Orbits[i].m_Radius -= Input.mouseScrollDelta.y * cameraScrollSensitivity;
+                TPCam.m_Orbits[i].m_Height -= Input.mouseScrollDelta.y * (cameraScrollSensitivity / 20);
             }
         }
     }
 
+    void lightAttacks() {
+        if (isGrounded) {
+            // TODO
+        }
+    }
+
     void dodgeMovement() {
-        // todo
+        // TODO
     }
     
 }
