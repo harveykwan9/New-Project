@@ -31,8 +31,22 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
             
         // character movement
-        jumpMovement();
-        axisMovement();
+        stateMachineWrapper();
+        // jumpMovement();
+        // axisMovement();
+        // scrollZoom();
+        // block();
+    }
+
+    // uses animatior statemachine to control movement, will idealy wrap all the movement and combat in one function;
+    void stateMachineWrapper() {
+        if (animator.GetBool("isBlock") == false) {
+            axisMovement();
+            jumpMovement();
+            block();
+        } else {
+            block();
+        }
         scrollZoom();
     }
 
@@ -87,6 +101,14 @@ public class PlayerMovement : MonoBehaviour
                 TPCam.m_Orbits[i].m_Radius -= Input.mouseScrollDelta.y * cameraScrollSensitivity;
                 TPCam.m_Orbits[i].m_Height -= Input.mouseScrollDelta.y * (cameraScrollSensitivity / 20);
             }
+        }
+    }
+
+    void block() {
+        if (Input.GetKey(KeyCode.E)) {
+            animator.SetBool("isBlock", true);
+        } else {
+            animator.SetBool("isBlock", false);
         }
     }
 
